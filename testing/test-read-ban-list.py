@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BM_TOKEN = os.getenv("BM_TOKEN")
-ORG = os.getenv("ORG")
+BM_ORG_ID = os.getenv("BM_ORG_ID")
 
 if not BM_TOKEN:
     raise SystemExit(
@@ -32,8 +32,8 @@ params_dict = {
     "sort": "-timestamp",
     "include": "player,server",
 }
-if ORG:
-    params_dict["filter[organization]"] = ORG
+if BM_ORG_ID:
+    params_dict["filter[organization]"] = BM_ORG_ID
 params = urllib.parse.urlencode(params_dict)
 url = f"https://api.battlemetrics.com/bans?{params}"
 print(f"Requesting: {url}\n")

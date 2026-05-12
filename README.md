@@ -6,8 +6,10 @@ Polls the [BattleMetrics](https://www.battlemetrics.com) API for new bans and an
 
 - On first run, the current ban list is cached silently (no announcements).
 - Every `POLL_INTERVAL` seconds, new bans are fetched and posted to Discord.
-- Bans marked as hidden are skipped.
+- Ban notes that end in **hidden** will not be announced.
 - Seen ban IDs are persisted in `sent_bans_ids.txt` to survive restarts.
+- Names with links will have the *https* and *.com* removed.
+- Removes text after a | symbol (Example: "Rule violation | Appeal @ Discord.gg/server" -> "reason": "Rule violation")
 
 ## Configuration
 
