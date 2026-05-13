@@ -95,7 +95,9 @@ async def fetch_latest_bans(session: aiohttp.ClientSession) -> list[tuple]:
 
         player_id = rels.get("player", {}).get("data", {}).get("id")
         player_name = player_names.get(player_id, "Unknown") if player_id else "Unknown"
-        player_name = player_name.replace("https://", "").replace(".com", "")
+        player_name = (
+            player_name.replace("https://", "").replace(".com", "").replace("@", "")
+        )
         raw_reason = attrs.get("reason", "No reason given")
         reason = raw_reason.split("|")[0].strip()
         uid = attrs.get("uid", ban_id)
