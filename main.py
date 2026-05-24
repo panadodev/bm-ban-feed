@@ -6,11 +6,13 @@ import os
 import re
 import urllib.parse
 from pathlib import Path
-
+import sentry_sdk
 import aiohttp
 from dotenv import load_dotenv
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 load_dotenv()
+
 
 BM_TOKEN = os.getenv("BM_TOKEN")
 WEBHOOK = os.getenv("WEBHOOK")
@@ -19,12 +21,25 @@ CACHE_FILE = Path("sent_bans_ids.txt")
 LOG_FILE = Path("ban_feed.log")
 POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", 60))
 
+# Initialize Sentry if DSN is provided
+if os.getenv("SENTRY_DSN"):
+    sentry_sdk.init(
+        dsn=os.getenv("SENTRY_DSN"),
+        send_default_pii=True,
+        max_request_body_size="always",
+        traces_sample_rate=1.0,
+        integrations=[
+            LoggingIntegration(level=logging.INFO, event_level=logging.ERROR)
+        ],
+    )
+else:
+    print("Warning: SENTRY_DSN not set. Errors will not be sent to Sentry.")
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     handlers=[
-        logging.FileHandler(LOG_FILE, encoding="utf-8"),
         logging.StreamHandler(),
     ],
 )
@@ -126,7 +141,8 @@ async def poll_loop(session: aiohttp.ClientSession, seen_ids: set[str]) -> None:
             if new_bans:
                 save_seen_ids(seen_ids)
 
-        except Exception:
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
             log.exception("Error during poll")
 
         log.info("No new bans found. Next check in %ds...", POLL_INTERVAL)

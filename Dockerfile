@@ -7,6 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     BM_TOKEN="" \
     WEBHOOK="" \
     BM_ORG_ID="" \
+    SENTRY_DSN=""\
     POLL_INTERVAL=60
 
 # Set working directory
